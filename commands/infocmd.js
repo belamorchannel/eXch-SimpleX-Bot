@@ -8,13 +8,16 @@ class InfoCommands {
     async rates(senderName, args, ws) {
         try {
             const rates = await getRates('dynamic');
+            if (!rates || Object.keys(rates).length === 0) {
+                throw new Error('No rates data received from API');
+            }
             const formattedRates = formatRates(rates);
-            const ratesMessage = 
+            await this.bot.safeSendMessage(senderName, 
                 '!2 Exchange Rates!\n\n' +
                 'Current Rates (Dynamic):\n' +
-                formattedRates;
-            await this.bot.safeSendMessage(senderName, ratesMessage, ws);
+                formattedRates, ws);
         } catch (error) {
+            console.error(`Error in /rates for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /rates: ${error.message}!\nContact support@exch.cx`, ws);
         }
@@ -23,13 +26,16 @@ class InfoCommands {
     async reserves(senderName, args, ws) {
         try {
             const reserves = await getReserves();
+            if (!reserves || Object.keys(reserves).length === 0) {
+                throw new Error('No reserves data received from API');
+            }
             const formattedReserves = formatReserves(reserves);
-            const reservesMessage = 
+            await this.bot.safeSendMessage(senderName, 
                 '!2 Currency Reserves!\n\n' +
                 'Available Reserves:\n' +
-                formattedReserves;
-            await this.bot.safeSendMessage(senderName, reservesMessage, ws);
+                formattedReserves, ws);
         } catch (error) {
+            console.error(`Error in /reserves for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /reserves: ${error.message}!\nContact support@exch.cx`, ws);
         }
@@ -38,13 +44,16 @@ class InfoCommands {
     async volume(senderName, args, ws) {
         try {
             const volume = await getVolume();
+            if (!volume) {
+                throw new Error('Volume data unavailable');
+            }
             const formattedVolume = formatVolume(volume);
-            const volumeMessage = 
+            await this.bot.safeSendMessage(senderName, 
                 '!2 24-Hour Trading Volume!\n\n' +
                 'Trading Activity:\n' +
-                formattedVolume;
-            await this.bot.safeSendMessage(senderName, volumeMessage, ws);
+                formattedVolume, ws);
         } catch (error) {
+            console.error(`Error in /volume for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /volume: ${error.message}!\nContact support@exch.cx`, ws);
         }
@@ -53,13 +62,16 @@ class InfoCommands {
     async status(senderName, args, ws) {
         try {
             const status = await getStatus();
+            if (!status) {
+                throw new Error('Status data unavailable');
+            }
             const formattedStatus = formatStatus(status);
-            const statusMessage = 
+            await this.bot.safeSendMessage(senderName, 
                 '!2 Network Status!\n\n' +
                 'Current Network Conditions:\n' +
-                formattedStatus;
-            await this.bot.safeSendMessage(senderName, statusMessage, ws);
+                formattedStatus, ws);
         } catch (error) {
+            console.error(`Error in /status for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /status: ${error.message}!\nContact support@exch.cx`, ws);
         }

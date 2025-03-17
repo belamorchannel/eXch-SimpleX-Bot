@@ -14,18 +14,12 @@ function waitForPort(port, timeout = 60000) {
                 })
                 .on('timeout', () => {
                     socket.destroy();
-                    if (Date.now() - startTime > timeout) {
-                        reject(new Error(`Port ${port} not available after ${timeout}ms`));
-                    } else {
-                        setTimeout(checkPort, 1000);
-                    }
+                    if (Date.now() - startTime > timeout) reject(new Error(`Port ${port} not available after ${timeout}ms`));
+                    else setTimeout(checkPort, 1000);
                 })
                 .on('error', () => {
-                    if (Date.now() - startTime > timeout) {
-                        reject(new Error(`Port ${port} not available after ${timeout}ms`));
-                    } else {
-                        setTimeout(checkPort, 1000);
-                    }
+                    if (Date.now() - startTime > timeout) reject(new Error(`Port ${port} not available after ${timeout}ms`));
+                    else setTimeout(checkPort, 1000);
                 })
                 .connect(port, '127.0.0.1');
         };
@@ -47,40 +41,34 @@ function sendMessage(senderName, messageContent, ws) {
 
 function subscribeToEvents(ws) {
     const corrId = "id" + Math.round(Math.random() * 999999);
-    const message = JSON.stringify({ corrId, cmd: '/subscribe on' });
-    ws.send(message);
+    ws.send(JSON.stringify({ corrId, cmd: '/subscribe on' }));
 }
 
 function getInvitationLink(ws) {
     const corrId = "id" + Math.round(Math.random() * 999999);
-    const message = JSON.stringify({ corrId, cmd: '/connect' });
-    ws.send(message);
+    ws.send(JSON.stringify({ corrId, cmd: '/connect' }));
 }
 
 function connectWebSocket(port, messageHandler) {
-    let ws;
-    const connect = () => {
-        ws = new WebSocket(`ws://localhost:${port}`);
+    let ws = new WebSocket(`ws://localhost:${port}`);
 
-        ws.on('open', () => {
-            console.log('WebSocket connected');
-            subscribeToEvents(ws);
-            getInvitationLink(ws);
-        });
+    ws.on('open', () => {
+        console.log('WebSocket connected');
+        subscribeToEvents(ws);
+        getInvitationLink(ws);
+    });
 
-        ws.on('message', (data) => {
-            const response = JSON.parse(data.toString());
-            messageHandler(response, ws);
-        });
+    ws.on('message', (data) => {
+        const response = JSON.parse(data.toString());
+        messageHandler(response, ws);
+    });
 
-        ws.on('error', (error) => console.error('WebSocket error:', error.message));
-        ws.on('close', () => {
-            console.log('WebSocket closed, reconnecting...');
-            setTimeout(connect, 5000);
-        });
-    };
+    ws.on('error', (error) => console.error('WebSocket error:', error.message));
+    ws.on('close', () => {
+        console.log('WebSocket closed, reconnecting...');
+        setTimeout(() => connectWebSocket(port, messageHandler), 5000);
+    });
 
-    connect();
     return ws;
 }
 

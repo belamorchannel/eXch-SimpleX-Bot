@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const API_BASE_URL = process.env.API_BASE_URL;
 const API_KEY = process.env.API_KEY;
-const AFFILIATE_ID = process.env.AFFILIATE_ID
+const AFFILIATE_ID = process.env.AFFILIATE_ID;
 
 if (!API_BASE_URL) {
     throw new Error('API_BASE_URL must be set in the .env file');
@@ -11,7 +11,7 @@ if (!API_BASE_URL) {
 
 const addressPatterns = {
     BTC: /^(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})$/,
-    BTCLN: /^ln[a-z0-9]{20,}$/, // Updated for Lightning Network (simplified)
+    BTCLN: /^ln[a-z0-9]{20,}$/,
     ETH: /^0x[a-fA-F0-9]{40}$/,
     DAI: /^0x[a-fA-F0-9]{40}$/,
     USDC: /^0x[a-fA-F0-9]{40}$/,
@@ -60,15 +60,10 @@ async function getPairInfo(fromCurrency, toCurrency, rateMode = 'dynamic') {
         if (!rates[pairKey]) {
             throw new Error(`Pair ${fromCurrency} to ${toCurrency} not supported`);
         }
-
-        const rate = parseFloat(rates[pairKey].rate);
-        const reserve = parseFloat(rates[pairKey].reserve);
-        const svcFee = parseFloat(rates[pairKey].svc_fee);
-
         return {
-            rate,
-            reserve,
-            fee: svcFee
+            rate: parseFloat(rates[pairKey].rate),
+            reserve: parseFloat(rates[pairKey].reserve),
+            fee: parseFloat(rates[pairKey].svc_fee)
         };
     } catch (error) {
         throw new Error(error.response?.data?.error || `Failed to fetch pair info: ${error.message}`);
@@ -104,7 +99,7 @@ async function getStatus() {
 }
 
 async function createExchange(fromCurrency, toCurrency, toAddress, amount, options = {}) {
-    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = AFFILIATE_ID, aggregation = 'any' } = options;
+    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = AFFILIATE_ID } = options;
     try {
         const response = await axios.post(`${API_BASE_URL}/create`, new URLSearchParams({
             from_currency: fromCurrency,
@@ -115,7 +110,6 @@ async function createExchange(fromCurrency, toCurrency, toAddress, amount, optio
             rate_mode: rateMode,
             fee_option: feeOption,
             ref,
-            aggregation,
             api_key: API_KEY
         }), {
             headers: { 
@@ -141,7 +135,6 @@ async function getOrderStatus(orderId) {
                 timeout: 10000
             });
             if (response.data.error) throw new Error(response.data.error);
-            console.log('Order Status Response:', response.data);
             return response.data;
         } catch (error) {
             console.error(`Attempt ${attempt} failed for order ${orderId}: ${error.message}`);
@@ -366,9 +359,9 @@ function extractCurrencies(rates) {
 }
 
 module.exports = { 
-    getRates, formatRates, getReserves, formatReserves, getVolume, formatVolume, 
-    getStatus, formatStatus, createExchange, getOrderStatus, fetchGuarantee, 
-    requestRefund, confirmRefund, revalidateAddress, removeOrder, 
-    sendSupportMessage, getSupportMessages, extractCurrencies, 
-    formatOrderStatus, formatSupportMessages, validateAddress, getPairInfo 
+    getRates, formatRates, getReserves, formatReserves, getVolume, formatVolume,
+    getStatus, formatStatus, createExchange, getOrderStatus, fetchGuarantee,
+    requestRefund, confirmRefund, revalidateAddress, removeOrder,
+    sendSupportMessage, getSupportMessages, validateAddress, getPairInfo,
+    formatOrderStatus, formatSupportMessages, extractCurrencies
 };

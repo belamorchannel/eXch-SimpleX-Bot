@@ -8,15 +8,12 @@ class ExchangeCommands {
     async exchange(senderName, args, ws) {
         try {
             if (args.length !== 4) {
-                const currencyList = this.bot.availableCurrencies.map(c => {
-                    if (['DAI', 'USDC', 'USDT'].includes(c)) return `${c} (ERC-20)`;
-                    return c;
-                }).join(', ');
+                const currencyList = this.bot.availableCurrencies.join(', ');
                 await this.bot.safeSendMessage(senderName, 
                     '!1 ⚠️ Invalid Format!\n' +
                     'Use: !2 /exchange <from> <to> <address>!\n' +
-                    'Example: `/exchange BTC ETH 0x123...`\n' +
-                    'Available Currencies: ' + currencyList, ws);
+                    `Example: /exchange BTC ETH 0x123...\n` +
+                    `Available Currencies: ${currencyList}`, ws);
                 return;
             }
 
@@ -27,13 +24,13 @@ class ExchangeCommands {
             if (!this.bot.availableCurrencies.includes(fromCurrency)) {
                 await this.bot.safeSendMessage(senderName, 
                     `!1 ⚠️ Invalid From Currency: ${fromCurrency}!\n` +
-                    'Available Currencies: ' + this.bot.availableCurrencies.join(', '), ws);
+                    `Available Currencies: ${this.bot.availableCurrencies.join(', ')}`, ws);
                 return;
             }
             if (!this.bot.availableCurrencies.includes(toCurrency)) {
                 await this.bot.safeSendMessage(senderName, 
                     `!1 ⚠️ Invalid To Currency: ${toCurrency}!\n` +
-                    'Available Currencies: ' + this.bot.availableCurrencies.join(', '), ws);
+                    `Available Currencies: ${this.bot.availableCurrencies.join(', ')}`, ws);
                 return;
             }
             if (!validateAddress(toCurrency, toAddress)) {
@@ -44,26 +41,19 @@ class ExchangeCommands {
             const flatInfo = await getPairInfo(fromCurrency, toCurrency, 'flat');
             const dynamicInfo = await getPairInfo(fromCurrency, toCurrency, 'dynamic');
 
-            const flatRate = flatInfo.rate;
-            const flatFee = flatInfo.fee;
-            const dynamicRate = dynamicInfo.rate;
-            const dynamicFee = dynamicInfo.fee;
-            const reserve = flatInfo.reserve || dynamicInfo.reserve || 'N/A';
-
             const modeMessage = 
                 '!2 Select Exchange Mode!\n' +
                 `Pair: ${fromCurrency} → ${toCurrency}\n\n` +
                 `Flat Mode:\n` +
-                `Rate: 1 ${fromCurrency} = ${flatRate.toFixed(8)} ${toCurrency}\n` +
-                `Service Fee: ${flatFee.toFixed(2)}%\n\n` +
+                `Rate: 1 ${fromCurrency} = ${flatInfo.rate.toFixed(8)} ${toCurrency}\n` +
+                `Service Fee: ${flatInfo.fee.toFixed(2)}%\n\n` +
                 `Dynamic Mode:\n` +
-                `Rate: 1 ${fromCurrency} = ${dynamicRate.toFixed(8)} ${toCurrency}\n` +
-                `Service Fee: ${dynamicFee.toFixed(2)}%\n\n` +
-                `Currency Reserve: ${reserve.toFixed(2)} ${toCurrency}\n\n` +
+                `Rate: 1 ${fromCurrency} = ${dynamicInfo.rate.toFixed(8)} ${toCurrency}\n` +
+                `Service Fee: ${dynamicInfo.fee.toFixed(2)}%\n\n` +
+                `Currency Reserve: ${flatInfo.reserve.toFixed(2)} ${toCurrency}\n\n` +
                 `Reply with "flat" or "dynamic" to proceed.`;
 
             await this.bot.safeSendMessage(senderName, modeMessage, ws);
-
             this.bot.exchangePending.set(senderName, { fromCurrency, toCurrency, toAddress });
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
@@ -90,9 +80,7 @@ class ExchangeCommands {
 
             const feeOption = mode === 'flat' ? 'f' : 'd';
             const result = await createExchange(fromCurrency, toCurrency, toAddress, 0.001, { 
-                refundAddress: '',
-                rateMode: mode,
-                feeOption: feeOption
+                refundAddress: '', rateMode: mode, feeOption: feeOption 
             });
             const orderId = result.orderid;
 
@@ -135,40 +123,23 @@ class ExchangeCommands {
                 `_Deposit address will be generated in 5-15 seconds._`;
 
             await this.bot.safeSendMessage(senderName, exchangeMessage, ws);
-
             await new Promise(resolve => setTimeout(resolve, 15000));
             await this.bot.sendDepositAddress(senderName, orderId, ws);
+
+            // Add the order to transaction tracking
+            this.bot.transactionTracker.addOrder(senderName, orderId);
 
             this.bot.activeExchanges.delete(orderId);
             this.bot.exchangePending.delete(senderName);
         } catch (error) {
             if (error.message.includes('TO_ADDRESS_INVALID')) {
                 await this.bot.safeSendMessage(senderName, 
-                    '!1 ⚠️ Invalid Address!\n' +
-                    'Use !2 /revalidate_address <order_id> <new_address>! to update.', ws);
+                    '!1 ⚠️ Invalid Address!\nUse !2 /revalidate_address <order_id> <new_address>! to update.', ws);
             } else {
                 await this.bot.safeSendMessage(senderName, 
                     `!1 ⚠️ Error in Mode Selection: ${error.message}!\nContact support@exch.cx`, ws);
             }
             this.bot.exchangePending.delete(senderName);
-        }
-    }
-
-    async cancel(senderName, args, ws) {
-        try {
-            if (this.bot.exchangePending.has(senderName)) {
-                this.bot.exchangePending.delete(senderName);
-                await this.bot.safeSendMessage(senderName, 
-                    '!2 Exchange Selection Cancelled!\n' +
-                    'Use !2 /exchange <from> <to> <address>! to start a new exchange.', ws);
-            } else {
-                await this.bot.safeSendMessage(senderName, 
-                    '!1 ⚠️ No Active Exchange to Cancel!\n' +
-                    'Use !2 /exchange <from> <to> <address>! to start an exchange.', ws);
-            }
-        } catch (error) {
-            await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /cancel: ${error.message}!\nContact support@exch.cx`, ws);
         }
     }
 }

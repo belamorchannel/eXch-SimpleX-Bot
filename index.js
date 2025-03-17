@@ -6,11 +6,12 @@ const Bot = require('./main/bot');
 async function startBot() {
     console.log('Starting..');
     try {
-        const cliProcess = await startClient(process.env.PORT);
+        await startClient(process.env.PORT);
         console.log('SimpleX CLI started');
 
-        const bot = new Bot();
-        connectWebSocket(process.env.PORT, (response, ws) => bot.handleMessage(response, ws));
+        let ws;
+        const bot = new Bot(ws);
+        ws = connectWebSocket(process.env.PORT, (response, ws) => bot.handleMessage(response, ws));
     } catch (error) {
         console.error('Failed to start SimpleX CLI:', error.message);
         process.exit(1);

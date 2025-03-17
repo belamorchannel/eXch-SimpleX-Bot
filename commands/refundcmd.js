@@ -9,16 +9,14 @@ class RefundCommands {
         try {
             if (args.length !== 2) {
                 await this.bot.safeSendMessage(senderName, 
-                    '!1 ⚠️ Invalid Format!\n' +
-                    'Use: !2 /refund <order_id>!', ws);
+                    '!1 ⚠️ Invalid Format!\nUse: !2 /refund <order_id>!', ws);
                 return;
             }
             const refundResult = await requestRefund(args[1]);
-            const refundMessage = refundResult.result 
-                ? `!2 Refund Requested for Order ${args[1]}!\n` +
-                  'Check status with !2 /order ' + args[1] + '!'
-                : `!1 ⚠️ Error: ${refundResult.error}!`;
-            await this.bot.safeSendMessage(senderName, refundMessage, ws);
+            await this.bot.safeSendMessage(senderName, 
+                refundResult.result 
+                    ? `!2 Refund Requested for Order ${args[1]}!\nCheck status with !2 /order ${args[1]}!`
+                    : `!1 ⚠️ Error: ${refundResult.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /refund: ${error.message}!\nContact support@exch.cx`, ws);
@@ -29,16 +27,14 @@ class RefundCommands {
         try {
             if (args.length !== 3) {
                 await this.bot.safeSendMessage(senderName, 
-                    '!1 ⚠️ Invalid Format!\n' +
-                    'Use: !2 /refund_confirm <order_id> <refund_address>!', ws);
+                    '!1 ⚠️ Invalid Format!\nUse: !2 /refund_confirm <order_id> <refund_address>!', ws);
                 return;
             }
             const confirmResult = await confirmRefund(args[1], args[2]);
-            const confirmMessage = confirmResult.result 
-                ? `!2 Refund Confirmed for Order ${args[1]}!\n` +
-                  'Check status with !2 /order ' + args[1] + '!'
-                : `!1 ⚠️ Error: ${confirmResult.error}!`;
-            await this.bot.safeSendMessage(senderName, confirmMessage, ws);
+            await this.bot.safeSendMessage(senderName, 
+                confirmResult.result 
+                    ? `!2 Refund Confirmed for Order ${args[1]}!\nCheck status with !2 /order ${args[1]}!`
+                    : `!1 ⚠️ Error: ${confirmResult.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /refund_confirm: ${error.message}!\nContact support@exch.cx`, ws);
