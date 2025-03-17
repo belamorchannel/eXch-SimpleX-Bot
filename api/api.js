@@ -3,10 +3,15 @@ require('dotenv').config();
 
 const API_BASE_URL = process.env.API_BASE_URL;
 const API_KEY = process.env.API_KEY;
+const AFFILIATE_ID = process.env.AFFILIATE_ID
+
+if (!API_BASE_URL) {
+    throw new Error('API_BASE_URL must be set in the .env file');
+}
 
 const addressPatterns = {
     BTC: /^(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})$/,
-    BTCLN: /^(?:[13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[a-z0-9]{39,59})$/,
+    BTCLN: /^ln[a-z0-9]{20,}$/, // Updated for Lightning Network (simplified)
     ETH: /^0x[a-fA-F0-9]{40}$/,
     DAI: /^0x[a-fA-F0-9]{40}$/,
     USDC: /^0x[a-fA-F0-9]{40}$/,
@@ -99,7 +104,7 @@ async function getStatus() {
 }
 
 async function createExchange(fromCurrency, toCurrency, toAddress, amount, options = {}) {
-    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = '8bb40cDD', aggregation = 'any' } = options;
+    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = AFFILIATE_ID, aggregation = 'any' } = options;
     try {
         const response = await axios.post(`${API_BASE_URL}/create`, new URLSearchParams({
             from_currency: fromCurrency,
