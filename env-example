@@ -9,4 +9,6 @@ DB_PATH=C:\\path\\to\\orders.db
 # API Configuration
 API_BASE_URL=https://exch.cx/api
 API_KEY=No need
+
+# AFFILIATE_ID Configuration
 AFFILIATE_ID=ID
