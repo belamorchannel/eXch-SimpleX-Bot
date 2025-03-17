@@ -1,11 +1,12 @@
-# SimpleX CLI Configuration
+# SimpleX CLI
 SIMPLEX_PATH=C:\\path\\to\\simplex-chat-cli-file
 SIMPLEX_DB=C:\\path\\to\\db_chat.db
 PORT=5223
 
-# SQLite Database Configuration
+# SQLite Database
 DB_PATH=C:\\path\\to\\orders.db
 
-# API Configuration
+# API 
 API_BASE_URL=https://exch.cx/api
-API_KEY=noneed
+API_KEY=No need
+
