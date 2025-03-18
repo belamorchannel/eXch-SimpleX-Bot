@@ -1,6 +1,7 @@
 const { getRates, extractCurrencies, getOrderStatus } = require('../api/api');
 const { sendMessage } = require('../websocket/websock');
 const TransactionTracker = require('./txtrack');
+const AntiSpam = require('../protection/antispam');
 
 const HelpCommand = require('../commands/helpcmd');
 const InfoCommands = require('../commands/infocmd');
@@ -25,6 +26,7 @@ class Bot {
         this.supportCommands = new SupportCommands(this);
 
         this.transactionTracker = new TransactionTracker(this);
+        this.antiSpam = new AntiSpam(5000); //
 
         this.initializeCurrencies();
     }
@@ -40,7 +42,6 @@ class Bot {
     }
 
     isSystemMessage(text) {
-        // Existing list of system message patterns
         const systemMessagePatterns = [
             'contact deleted',
             'This conversation is protected by quantum resistant end-to-end encryption',
@@ -65,7 +66,7 @@ class Bot {
     }
 
     async handleMessage(response, ws) {
-        this.ws = ws; // Ensure ws is updated
+        this.ws = ws;
         if (response.resp?.type === 'subscriptionEnd') {
             console.log('Subscription ended, attempting to reconnect in 5 seconds...');
             return;
@@ -85,7 +86,6 @@ class Bot {
 
         if (response.resp?.type === 'newChatItems') {
             const item = response.resp.chatItems?.[0];
-            // Ignore events with no valid chatItem (e.g., empty chatItems array)
             if (!item || !item.chatItem || response.resp.chatItems.length === 0) {
                 console.log('Ignoring newChatItems event with no valid chatItem:', JSON.stringify(response.resp, null, 2));
                 return;
@@ -97,13 +97,11 @@ class Bot {
                 const itemText = chatItem.meta?.itemText || '';
                 console.log(`Message from ${senderName}: ${itemText}`);
 
-                // Ignore system messages (profile changes, notifications, contact deletions, etc.)
                 if (this.isSystemMessage(itemText)) {
                     console.log(`Ignoring system message/notification from ${senderName}: ${itemText}`);
                     return;
                 }
 
-                // Process user commands if not a system message
                 if (!this.connectedUsers.has(senderName)) {
                     const welcomeMessage = 
                         'Welcome to eXch Bot\n\n' +
@@ -134,6 +132,12 @@ class Bot {
     }
 
     async processCommand(senderName, text, ws) {
+        const spamCheck = this.antiSpam.canExecute(senderName);
+        if (!spamCheck.allowed) {
+            await this.safeSendMessage(senderName, spamCheck.message, ws);
+            return;
+        }
+
         if (this.exchangePending.has(senderName)) {
             const mode = text.trim().toLowerCase();
             await this.exchangeCommands.handleModeSelection(senderName, mode, ws);
