@@ -1,4 +1,4 @@
-const { getRates, formatRates, getReserves, formatReserves, getVolume, formatVolume, getStatus, formatStatus } = require('../api/api');
+const { getRates, formatRates, getReserves, formatReserves, getStatus, formatStatus } = require('../api/api');
 
 class InfoCommands {
     constructor(bot) {
@@ -38,24 +38,6 @@ class InfoCommands {
             console.error(`Error in /reserves for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
                 `!1 ⚠️ Error in /reserves: ${error.message}!\nContact support@exch.cx`, ws);
-        }
-    }
-
-    async volume(senderName, args, ws) {
-        try {
-            const volume = await getVolume();
-            if (!volume) {
-                throw new Error('Volume data unavailable');
-            }
-            const formattedVolume = formatVolume(volume);
-            await this.bot.safeSendMessage(senderName, 
-                '!2 24-Hour Trading Volume!\n\n' +
-                'Trading Activity:\n' +
-                formattedVolume, ws);
-        } catch (error) {
-            console.error(`Error in /volume for ${senderName}:`, error.message);
-            await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /volume: ${error.message}!\nContact support@exch.cx`, ws);
         }
     }
 
