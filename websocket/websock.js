@@ -30,7 +30,7 @@ function waitForPort(port, timeout = 60000) {
 function sendMessage(senderName, messageContent, ws) {
     return new Promise((resolve, reject) => {
         const corrId = "id" + Math.round(Math.random() * 999999);
-        // Экранируем имя с пробелами в одинарные кавычки
+
         const escapedName = senderName.includes(' ') ? `'${senderName}'` : senderName;
         const cmd = `@${escapedName} ${messageContent}`;
         const message = JSON.stringify({ corrId, cmd });
@@ -44,7 +44,7 @@ function sendMessage(senderName, messageContent, ws) {
 function sendImage(senderName, filePath, ws) {
     return new Promise((resolve, reject) => {
         const corrId = "id" + Math.round(Math.random() * 999999);
-        // Экранируем имя с пробелами в одинарные кавычки
+
         const escapedName = senderName.includes(' ') ? `'${senderName}'` : senderName;
         const cmd = `/img @${escapedName} ${filePath}`;
         const message = JSON.stringify({ corrId, cmd });
