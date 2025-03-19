@@ -16,7 +16,7 @@ const addressPatterns = {
     DAI: /^0x[a-fA-F0-9]{40}$/,
     USDC: /^0x[a-fA-F0-9]{40}$/,
     USDT: /^0x[a-fA-F0-9]{40}$/,
-    LTC: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/,
+    LTC: /^(?:[LM][a-km-zA-HJ-NP-Z1-9]{26,33}|ltc1[a-z0-9]{39,59})$/,
     DASH: /^X[1-9A-HJ-NP-Za-km-z]{33}$/,
     XMR: /^[48][0-9AB][1-9A-HJ-NP-Za-km-z]{93}$/
 };

@@ -3,7 +3,7 @@ const { getOrderStatus } = require('../api/api');
 class TransactionTracker {
     constructor(bot) {
         this.bot = bot;
-        this.activeOrders = new Map(); // Map of user -> { orderId, startTime, lastState }
+        this.activeOrders = new Map();
         this.startTracking();
     }
 
@@ -26,19 +26,14 @@ class TransactionTracker {
             for (const [user, orderData] of this.activeOrders.entries()) {
                 const { orderId, startTime, lastState } = orderData;
                 try {
-                    const elapsedTime = (Date.now() - startTime) / 1000 / 60; // Time in minutes
+                    const elapsedTime = (Date.now() - startTime) / 1000 / 60;
                     const orderInfo = await getOrderStatus(orderId);
 
-                    // Check for inactivity (no deposit within 30 minutes)
                     if (elapsedTime >= 30) {
                         if (orderInfo.state === 'AWAITING_INPUT' && !orderInfo.from_amount_received) {
-                            // Notify user and remove from tracking
                             await this.bot.safeSendMessage(user, 
                                 `!1 ⚠️ Order ${orderId} Removed from Tracking!\n` +
-                                `No funds received within 30 minutes.\n` +
-                                `You can still track the order manually via the links below:\n` +
-                                `Link: https://exch.cx/order/${orderId}\n` +
-                                `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}`, 
+                                `No funds received within 30 minutes.`, 
                                 this.bot.ws
                             );
                             this.removeOrder(user);
@@ -47,70 +42,48 @@ class TransactionTracker {
                         }
                     }
 
-                    // Track order progress
                     if (orderInfo.state !== lastState) {
                         orderData.lastState = orderInfo.state;
                         switch (orderInfo.state) {
-                            case 'AWAITING_INPUT':
+                            case 'CONFIRMING_INPUT':
                                 if (orderInfo.from_amount_received) {
                                     await this.bot.safeSendMessage(user, 
-                                        `!2 Order ${orderId} Update!\n` +
-                                        `Deposit Detected: ${orderInfo.from_amount_received} ${orderInfo.from_currency}\n` +
-                                        `Awaiting confirmation...`, 
+                                        `!2 ✅ Order ${orderId} - Transaction Detected!\n` +
+                                        `We have detected your transaction of ${orderInfo.from_amount_received || 'N/A'} ${orderInfo.from_currency || 'N/A'}. ` +
+                                        `Awaiting network confirmation.`, 
                                         this.bot.ws
                                     );
-                                    console.log(`Deposit detected for order ${orderId} for user ${user}`);
+                                    console.log(`Transaction detected for order ${orderId} for user ${user}`);
                                 }
                                 break;
-                            case 'CONFIRMING_INPUT':
-                                await this.bot.safeSendMessage(user, 
-                                    `!2 Order ${orderId} Update!\n` +
-                                    `Deposit Confirmed!\n` +
-                                    `Processing exchange...`, 
-                                    this.bot.ws
-                                );
-                                console.log(`Deposit confirmed for order ${orderId} for user ${user}`);
-                                break;
-                            case 'EXCHANGING':
-                            case 'FUNDED':
-                            case 'BRIDGING':
-                                await this.bot.safeSendMessage(user, 
-                                    `!2 Order ${orderId} Update!\n` +
-                                    `Funds Received!\n` +
-                                    `Sending transaction...`, 
-                                    this.bot.ws
-                                );
-                                console.log(`Funds received, sending transaction for order ${orderId} for user ${user}`);
-                                break;
                             case 'CONFIRMING_SEND':
-                                await this.bot.safeSendMessage(user, 
-                                    `!2 Order ${orderId} Update!\n` +
-                                    `Transaction Sent!\n` +
-                                    `Awaiting final confirmation...`, 
-                                    this.bot.ws
-                                );
-                                console.log(`Transaction sent for order ${orderId} for user ${user}`);
+                                if (orderInfo.to_amount) {
+                                    await this.bot.safeSendMessage(user, 
+                                        `!2 🚀 Order ${orderId} - Transaction Confirmed & Funds Sent!\n` +
+                                        `The transaction has been confirmed. We are sending you ${orderInfo.to_amount || 'N/A'} ${orderInfo.to_currency || 'N/A'}. ` +
+                                        `Awaiting final confirmation.`, 
+                                        this.bot.ws
+                                    );
+                                    console.log(`Funds sent for order ${orderId} for user ${user}`);
+                                }
                                 break;
                             case 'COMPLETE':
-                                await this.bot.safeSendMessage(user, 
-                                    `!2 Order ${orderId} Update!\n` +
-                                    `Exchange Completed Successfully!\n` +
-                                    `Check your wallet for ${orderInfo.to_amount} ${orderInfo.to_currency}.\n` +
-                                    `Transaction ID: ${orderInfo.transaction_id_sent || 'N/A'}\n` +
-                                    `Link: https://exch.cx/order/${orderId}\n` +
-                                    `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}`, 
-                                    this.bot.ws
-                                );
-                                console.log(`Exchange completed for order ${orderId} for user ${user}`);
-                                this.removeOrder(user);
+                                if (orderInfo.transaction_id_sent) {
+                                    await this.bot.safeSendMessage(user, 
+                                        `!2 🎉 Order ${orderId} - Transaction Completed!\n` +
+                                        `You have received ${orderInfo.to_amount || 'N/A'} ${orderInfo.to_currency || 'N/A'}! ` +
+                                        `Transaction ID: ${orderInfo.transaction_id_sent || 'N/A'}.`, 
+                                        this.bot.ws
+                                    );
+                                    console.log(`Exchange completed for order ${orderId} for user ${user}`);
+                                    this.removeOrder(user);
+                                }
                                 break;
                             case 'CANCELLED':
                             case 'REFUNDED':
                                 await this.bot.safeSendMessage(user, 
                                     `!1 ⚠️ Order ${orderId} ${orderInfo.state}!\n` +
-                                    `The order has been ${orderInfo.state.toLowerCase()}.\n` +
-                                    `Link: https://exch.cx/order/${orderId}\n` +
-                                    `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}`, 
+                                    `The order has been ${orderInfo.state.toLowerCase()}.`, 
                                     this.bot.ws
                                 );
                                 this.removeOrder(user);
@@ -129,7 +102,7 @@ class TransactionTracker {
                     );
                 }
             }
-        }, 30000); // Check every 30 seconds
+        }, 30000);
     }
 }
 

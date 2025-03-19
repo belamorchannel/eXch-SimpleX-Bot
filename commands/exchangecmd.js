@@ -38,6 +38,13 @@ class ExchangeCommands {
                 return;
             }
 
+            // Оповещение о сети ERC-20 для USDT/USDC/DAI
+            const erc20Currencies = ['USDT', 'USDC', 'DAI'];
+            if (erc20Currencies.includes(toCurrency)) {
+                await this.bot.safeSendMessage(senderName, 
+                    '!1 ⚠️ Please note:! For !3 USDT/USDC/DAI!, we only use the !4 ERC-20 network.!', ws);
+            }
+
             const flatInfo = await getPairInfo(fromCurrency, toCurrency, 'flat');
             const dynamicInfo = await getPairInfo(fromCurrency, toCurrency, 'dynamic');
 
