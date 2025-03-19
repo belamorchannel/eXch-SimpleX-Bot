@@ -10,7 +10,6 @@ class HelpCommand {
                 'Exchange Actions\n' +
                 '- !2 /rates! - _View current exchange rates_\n' +
                 '- !2 /reserves! - _Check currency reserves_\n' +
-                '- !2 /volume! - _See 24-hour trading volume_\n' +
                 '- !2 /status! - _Check network status_\n' +
                 '- !2 /exchange <from> <to> <address>! - _Start an exchange_\n\n' +
                 'Order Management\n' +
