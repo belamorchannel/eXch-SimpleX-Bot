@@ -232,9 +232,6 @@ class Bot {
                 case '/reserves':
                     await this.infoCommands.reserves(senderName, args, ws);
                     break;
-                case '/volume':
-                    await this.infoCommands.volume(senderName, args, ws);
-                    break;
                 case '/status':
                     await this.infoCommands.status(senderName, args, ws);
                     break;
