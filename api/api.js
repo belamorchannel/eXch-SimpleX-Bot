@@ -70,20 +70,6 @@ async function getPairInfo(fromCurrency, toCurrency, rateMode = 'dynamic') {
     }
 }
 
-async function getVolume() {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/volume`, {
-            params: { api_key: API_KEY },
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        if (response.data.error) throw new Error(response.data.error);
-        return response.data;
-    } catch (error) {
-        console.warn('API /volume unavailable:', error.message);
-        return null;
-    }
-}
-
 async function getStatus() {
     try {
         const response = await axios.get(`${API_BASE_URL}/status`, {
@@ -99,7 +85,7 @@ async function getStatus() {
 }
 
 async function createExchange(fromCurrency, toCurrency, toAddress, amount, options = {}) {
-    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = AFFILIATE_ID } = options;
+    const { refundAddress = '', rateMode = 'dynamic', feeOption = 'f', ref = AFFILIATE_ID, aggregation = 'any' } = options;
     try {
         const response = await axios.post(`${API_BASE_URL}/create`, new URLSearchParams({
             from_currency: fromCurrency,
@@ -109,6 +95,7 @@ async function createExchange(fromCurrency, toCurrency, toAddress, amount, optio
             refund_address: refundAddress,
             rate_mode: rateMode,
             fee_option: feeOption,
+            aggregation,
             ref,
             api_key: API_KEY
         }), {
@@ -283,15 +270,6 @@ function formatReserves(data) {
     return response.trim();
 }
 
-function formatVolume(data) {
-    if (!data) return '📊 24-Hour Volume Unavailable\nContact support@exch.cx for assistance.';
-    let response = '📊 24-Hour Volume\n\n';
-    for (const [currency, volume] of Object.entries(data)) {
-        response += `${currency}: ${parseFloat(volume).toLocaleString('en-US', { maximumFractionDigits: 2 })}\n`;
-    }
-    return response.trim();
-}
-
 function formatStatus(data) {
     if (!data) return '🌐 Network Status Unavailable\nContact support@exch.cx for assistance.';
     let response = '🌐 Network Status\n\n';
@@ -359,7 +337,7 @@ function extractCurrencies(rates) {
 }
 
 module.exports = { 
-    getRates, formatRates, getReserves, formatReserves, getVolume, formatVolume,
+    getRates, formatRates, getReserves, formatReserves,
     getStatus, formatStatus, createExchange, getOrderStatus, fetchGuarantee,
     requestRefund, confirmRefund, revalidateAddress, removeOrder,
     sendSupportMessage, getSupportMessages, validateAddress, getPairInfo,
