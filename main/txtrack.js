@@ -76,8 +76,18 @@ class TransactionTracker {
                                         this.bot.ws
                                     );
                                     console.log(`Exchange completed for order ${orderId} for user ${user}`);
-                                    this.removeOrder(user);
+
+                                    await this.bot.safeSendMessage(user, 
+                                        `!2 Do you want to delete this ticket?\n` +
+                                        `Reply with "yes" to delete it or ignore this message.`, 
+                                        this.bot.ws
+                                    );
+                                    this.bot.pendingTicketRemoval = this.bot.pendingTicketRemoval || new Map();
+                                    this.bot.pendingTicketRemoval.set(user, orderId);
+                                    console.log(`Order ${orderId} for user ${user} is pending ticket removal`);
+                
                                 }
+                                this.removeOrder(user);
                                 break;
                             case 'CANCELLED':
                             case 'REFUNDED':
