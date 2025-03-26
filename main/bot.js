@@ -20,6 +20,9 @@ class Bot {
         this.availableCurrencies = ['BTC', 'BTCLN', 'DAI', 'DASH', 'ETH', 'LTC', 'USDC', 'USDT', 'XMR'];
         this.activeExchanges = new Set();
         this.exchangePending = new Map();
+        // BEGIN NEW CODE
+        this.pendingTicketRemoval = new Map(); // Track orders pending deletion
+        // END NEW CODE
 
         this.helpCommand = new HelpCommand(this);
         this.infoCommands = new InfoCommands(this);
@@ -190,12 +193,12 @@ class Bot {
                 }, 60000);
 
                 await this.safeSendMessage(senderName, 
-                    '!2 Guarantee Letter Downloads!\n' +
+                    `!2 Guarantee Letter Downloads!\n` +
                     `Link: https://exch.cx/order/${orderId}/fetch_guarantee\n` +
                     `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}/fetch_guarantee`, ws);
             } else {
                 await this.safeSendMessage(senderName, 
-                    'Deposit Address is Generating...\nCheck status with !2 /order ' + orderId + '!', ws);
+                    `Deposit Address is Generating...\nCheck status with !2 /order ${orderId}!`, ws);
             }
         } catch (error) {
             await this.safeSendMessage(senderName, 
@@ -214,6 +217,14 @@ class Bot {
         if (this.exchangePending.has(senderName)) {
             const mode = text.trim().toLowerCase();
             await this.exchangeCommands.handleModeSelection(senderName, mode, ws);
+            return;
+        }
+
+        if (this.pendingTicketRemoval && this.pendingTicketRemoval.has(senderName) && text.trim().toLowerCase() === "yes") {
+            const orderId = this.pendingTicketRemoval.get(senderName);
+            await this.orderCommands.removeOrder(senderName, ['/remove_order', orderId], ws);
+            this.pendingTicketRemoval.delete(senderName);
+            console.log(`User ${senderName} confirmed deletion of order ${orderId}`);
             return;
         }
 
@@ -264,11 +275,11 @@ class Bot {
                     break;
                 default:
                     await this.safeSendMessage(senderName, 
-                        '!1 ⚠️ Unknown Command!\nUse !2 /help! for a list of commands.', ws);
+                        `!1 ⚠️ Unknown Command!\nUse !2 /help! for a list of commands.`, ws);
             }
         } else {
             await this.safeSendMessage(senderName, 
-                '!1 ⚠️ Unknown Command!\nUse !2 /help! for a list of commands.', ws);
+                `!1 ⚠️ Unknown Command!\nUse !2 /help! for a list of commands.`, ws);
         }
     }
 }
