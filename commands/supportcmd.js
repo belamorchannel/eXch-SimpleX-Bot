@@ -19,7 +19,7 @@ class SupportCommands {
                     : `!1 ⚠️ Error: ${result.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /support_message: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /support_message: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -36,7 +36,7 @@ class SupportCommands {
                 formatSupportMessages(messages), ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /support_messages: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /support_messages: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 }
