@@ -25,11 +25,11 @@ class HelpCommand {
                 'Notes\n' +
                 '- Supported Currencies: `BTC, BTCLN, DAI, DASH, ETH, LTC, USDC, USDT, XMR`\n' +
                 '- Always verify addresses before sending.\n' +
-                '- For assistance, email support@exch.cx';
+                '- For assistance, email support@exch.net';
             await this.bot.safeSendMessage(senderName, helpMessage, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /help: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /help: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 }
