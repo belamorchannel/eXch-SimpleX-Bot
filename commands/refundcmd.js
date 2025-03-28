@@ -19,7 +19,7 @@ class RefundCommands {
                     : `!1 ⚠️ Error: ${refundResult.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /refund: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /refund: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -37,7 +37,7 @@ class RefundCommands {
                     : `!1 ⚠️ Error: ${confirmResult.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /refund_confirm: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /refund_confirm: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 }
