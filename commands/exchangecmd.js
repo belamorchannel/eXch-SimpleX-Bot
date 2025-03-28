@@ -64,7 +64,7 @@ class ExchangeCommands {
             this.bot.exchangePending.set(senderName, { fromCurrency, toCurrency, toAddress });
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /exchange: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /exchange: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -125,7 +125,7 @@ class ExchangeCommands {
                 `Min: ${minInput} ${fromCurrency}\n` +
                 `Max: ${maxInput} ${fromCurrency}\n` +
                 `Recipient Address: \`${toAddress}\`\n` +
-                `Link: https://exch.cx/order/${orderId}\n` +
+                `Link: https://exch.net/order/${orderId}\n` +
                 `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}\n` +
                 `_Deposit address will be generated in 5-15 seconds._`;
 
@@ -144,7 +144,7 @@ class ExchangeCommands {
                     '!1 ⚠️ Invalid Address!\nUse !2 /revalidate_address <order_id> <new_address>! to update.', ws);
             } else {
                 await this.bot.safeSendMessage(senderName, 
-                    `!1 ⚠️ Error in Mode Selection: ${error.message}!\nContact support@exch.cx`, ws);
+                    `!1 ⚠️ Error in Mode Selection: ${error.message}!\nContact support@exch.net`, ws);
             }
             this.bot.exchangePending.delete(senderName);
         }
