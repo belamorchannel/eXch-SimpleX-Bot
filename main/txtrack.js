@@ -78,7 +78,7 @@ class TransactionTracker {
                                     console.log(`Exchange completed for order ${orderId} for user ${user}`);
 
                                     await this.bot.safeSendMessage(user, 
-                                        `!2 Do you want to delete this ticket?\n` +
+                                        `!2 Do you want to delete this order?!\n` +
                                         `Reply with "yes" to delete it or ignore this message.`, 
                                         this.bot.ws
                                     );
