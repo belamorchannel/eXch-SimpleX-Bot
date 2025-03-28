@@ -271,7 +271,7 @@ function formatReserves(data) {
 }
 
 function formatStatus(data) {
-    if (!data) return '🌐 Network Status Unavailable\nContact support@exch.cx for assistance.';
+    if (!data) return '🌐 Network Status Unavailable\nContact support@exch.net for assistance.';
     let response = '🌐 Network Status\n\n';
     for (const [network, info] of Object.entries(data)) {
         let line = `${network}: ${info.status === 'online' ? 'Online ✅' : 'Offline ❌'}`;
@@ -298,7 +298,7 @@ function formatOrderStatus(orderInfo) {
         `Network Fee: ${networkFee} ${orderInfo.to_currency}\n` +
         `Recipient Address: ${orderInfo.to_addr || 'Not set'}\n` +
         `Deposit Address: ${orderInfo.from_addr || 'Generating...'}\n` +
-        `Link: https://exch.cx/order/${orderInfo.orderid}\n` +
+        `Link: https://exch.net/order/${orderInfo.orderid}\n` +
         `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderInfo.orderid}\n`;
 
     if (orderInfo.state_error === 'TO_ADDRESS_INVALID') {
