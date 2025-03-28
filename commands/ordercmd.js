@@ -18,7 +18,7 @@ class OrderCommands {
                 formatOrderStatus(orderInfo), ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /order: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /order: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -32,11 +32,11 @@ class OrderCommands {
             await fetchGuarantee(args[1]);
             await this.bot.safeSendMessage(senderName, 
                 '!2 Letter of Guarantee for Order ' + args[1] + '!\n' +
-                `Link: https://exch.cx/order/${args[1]}/fetch_guarantee\n` +
+                `Link: https://exch.net/order/${args[1]}/fetch_guarantee\n` +
                 `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${args[1]}/fetch_guarantee`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /fetch_guarantee: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /fetch_guarantee: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -59,7 +59,7 @@ class OrderCommands {
             }
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /revalidate_address: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /revalidate_address: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -77,7 +77,7 @@ class OrderCommands {
                     : `!1 ⚠️ Error: ${result.error}!`, ws);
         } catch (error) {
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /remove_order: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /remove_order: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 }
