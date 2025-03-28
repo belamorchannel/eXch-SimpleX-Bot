@@ -19,7 +19,7 @@ class InfoCommands {
         } catch (error) {
             console.error(`Error in /rates for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /rates: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /rates: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -37,7 +37,7 @@ class InfoCommands {
         } catch (error) {
             console.error(`Error in /reserves for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /reserves: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /reserves: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 
@@ -55,7 +55,7 @@ class InfoCommands {
         } catch (error) {
             console.error(`Error in /status for ${senderName}:`, error.message);
             await this.bot.safeSendMessage(senderName, 
-                `!1 ⚠️ Error in /status: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error in /status: ${error.message}!\nContact support@exch.net`, ws);
         }
     }
 }
