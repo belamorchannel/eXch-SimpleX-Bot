@@ -20,10 +20,7 @@ class Bot {
         this.availableCurrencies = ['BTC', 'BTCLN', 'DAI', 'DASH', 'ETH', 'LTC', 'USDC', 'USDT', 'XMR'];
         this.activeExchanges = new Set();
         this.exchangePending = new Map();
-        // BEGIN NEW CODE
-        this.pendingTicketRemoval = new Map(); // Track orders pending deletion
-        // END NEW CODE
-
+        this.pendingTicketRemoval = new Map(); 
         this.helpCommand = new HelpCommand(this);
         this.infoCommands = new InfoCommands(this);
         this.exchangeCommands = new ExchangeCommands(this);
@@ -142,7 +139,7 @@ class Bot {
             console.error(`Failed to send message to ${senderName}:`, error.message);
             if (ws && typeof ws.send === 'function') {
                 await sendMessage(senderName, 
-                    `!1 ⚠️ Connection Error: ${error.message}!\nPlease try again or contact support@exch.cx`, ws);
+                    `!1 ⚠️ Connection Error: ${error.message}!\nPlease try again or contact support@exch.net`, ws);
             }
         }
     }
@@ -161,7 +158,7 @@ class Bot {
             console.error(`Failed to send image to ${senderName}:`, error.message);
             if (ws && typeof ws.send === 'function') {
                 await sendMessage(senderName, 
-                    `!1 ⚠️ Error Sending QR Code: ${error.message}!\nContact support@exch.cx`, ws);
+                    `!1 ⚠️ Error Sending QR Code: ${error.message}!\nContact support@exch.net`, ws);
             }
         }
     }
@@ -194,7 +191,7 @@ class Bot {
 
                 await this.safeSendMessage(senderName, 
                     `!2 Guarantee Letter Downloads!\n` +
-                    `Link: https://exch.cx/order/${orderId}/fetch_guarantee\n` +
+                    `Link: https://exch.net/order/${orderId}/fetch_guarantee\n` +
                     `Tor Link: http://hszyoqwrcp7cxlxnqmovp6vjvmnwj33g4wviuxqzq47emieaxjaperyd.onion/order/${orderId}/fetch_guarantee`, ws);
             } else {
                 await this.safeSendMessage(senderName, 
@@ -202,7 +199,7 @@ class Bot {
             }
         } catch (error) {
             await this.safeSendMessage(senderName, 
-                `!1 ⚠️ Error Fetching Address or Generating QR: ${error.message}!\nContact support@exch.cx`, ws);
+                `!1 ⚠️ Error Fetching Address or Generating QR: ${error.message}!\nContact support@exch.net`, ws);
             console.error(`Error in sendDepositAddress for ${senderName}:`, error);
         }
     }
